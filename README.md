@@ -1,27 +1,25 @@
-# Torus Spiral Generator
+# Torus Diagonal Curve Generator
 
-A Maya Python script that generates a spiral curve wound around a NURBS torus using parametric equations.
+A Maya Python script that generates diagonal curves wound around a torus using parametric equations.
 
 ## Prerequisites
 
 - Autodesk Maya (with `maya.cmds`)
-- A NURBS torus in your scene (default name: `nurbsTorus1`)
 
 ## Usage
 
-1. Create a NURBS torus in Maya (`Create > NURBS Primitives > Torus`).
-2. Run the script in Maya's Script Editor (Python tab).
-
-The script reads the torus's `radius` and `sectionRadius` from the `makeNurbTorus1` construction history node and generates a spiral curve that wraps around the torus surface.
+Run the script in Maya's Script Editor (Python tab). It creates closed periodic curves that wrap diagonally around a torus shape.
 
 ## Parameters
 
 | Parameter | Default | Description |
 |---|---|---|
-| `loops` | `15` | Number of times the spiral winds around the tube |
-| `torus_name` | `"nurbsTorus1"` | Name of the torus object in the scene |
-| `points_per_loop` | `100` | Number of points per loop (controls smoothness) |
+| `sections` | `11` | Change the diagonal angle and density |
+| `spans` | `12` | Change the diagonal angle and density |
+| `minor_radius` | `0.7` | Tighten or loosen the hole |
+| `num_lines` | `1` | Add more parallel lines to fill it out |
+| `radius` | `1.0` | Scale the whole thing up/down |
 
 ## Output
 
-Creates a degree-3 NURBS curve named `torusSpiral` that follows the surface of the torus.
+Creates degree-3 periodic NURBS curves named `torusDiagonal_0`, `torusDiagonal_1`, etc.

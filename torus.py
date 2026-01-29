@@ -1,31 +1,45 @@
 import maya.cmds as cmds
 import math
 
-# Parameters
-loops = 15  # how many times it winds around the tube
-torus_name = "nurbsTorus1"  # change if your torus has a different name
-points_per_loop = 100  # smoothness
+# Torus shape
+radius = 1.0
+minor_radius = 0.7
 
-# Get torus dimensions from the makeNurbTorus node
-radius = cmds.getAttr("makeNurbTorus1.radius")
-section_radius = cmds.getAttr("makeNurbTorus1.sectionRadius")
+# Diagonal density
+sections = 11
+spans = 12
 
-# Generate spiral points
-points = []
-total_points = loops * points_per_loop
+# How many parallel lines do you want?
+num_lines = 1
 
-for i in range(total_points + 1):
-    t = (i / total_points) * loops * 2 * math.pi  # angle around tube
-    u = (i / total_points) * 2 * math.pi  # angle around torus center
+def gcd(a, b):
+    while b:
+        a, b = b, a % b
+    return a
+
+steps_to_close = (sections * spans) // gcd(sections, spans)
+
+for line_num in range(num_lines):
+    points = []
+    offset = (line_num / float(num_lines)) * 2 * math.pi
     
-    # Torus parametric equations with spiral
-    x = (radius + section_radius * math.cos(t)) * math.cos(u)
-    y = section_radius * math.sin(t)
-    z = (radius + section_radius * math.cos(t)) * math.sin(u)
+    for i in range(steps_to_close):
+        u = (i / float(sections)) * 2 * math.pi
+        t = (i / float(spans)) * 2 * math.pi + offset
+        
+        x = (radius + minor_radius * math.cos(t)) * math.cos(u)
+        y = minor_radius * math.sin(t)
+        z = (radius + minor_radius * math.cos(t)) * math.sin(u)
+        
+        points.append((x, y, z))
     
-    points.append((x, y, z))
+    # Wrap points for periodic curve
+    points = points + points[:3]
+    
+    # Create knots for periodic curve
+    knots = list(range(len(points) + 3 - 1))
+    
+    curve = cmds.curve(p=points, degree=3, k=knots, per=True)
+    cmds.rename(curve, "torusDiagonal_{}".format(line_num))
 
-# Create the curve
-curve = cmds.curve(p=points, degree=3)
-cmds.rename(curve, "torusSpiral")
-print("Created spiral with {} loops".format(loops))
+print("Done! Created {} lines".format(num_lines))
